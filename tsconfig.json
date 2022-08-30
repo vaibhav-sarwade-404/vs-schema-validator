@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "declarationDir": "dist",
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "lib": ["ES5", "ES2015", "ES2016"],
+    "types": ["node", "jest"],
+    "target": "ES6",
+    "module": "ES2015",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "declaration": true,
+    "outDir": "dist/esm",
+    "sourceMap": true,
+    "strict": true,
+    "allowJs": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "**/__tests__/*"]
+}

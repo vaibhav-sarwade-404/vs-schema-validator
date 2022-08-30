@@ -1,0 +1,51 @@
+{
+  "name": "vs-schema-validator",
+  "version": "0.0.1-beta.1",
+  "description": "Basic JSON schema validator",
+  "main": "dist/cjs/schemaValidator.js",
+  "module": "dist/esm/schemaValidator.js",
+  "types": "dist/schemaValidator.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "jest --config jestconfig.json",
+    "build": "rm -rf dist/ && npm test && npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc",
+    "build:cjs": "tsc --module commonJS --outDir dist/cjs",
+    "postinstall": "npm test && npm run build",
+    "prepublishOnly": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vaibhav-sarwade-404/vs-schema-validator"
+  },
+  "author": "Vaibhav Sarwade",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vaibhav-sarwade-404/vs-schema-validator/issues"
+  },
+  "homepage": "https://github.com/vaibhav-sarwade-404/vs-schema-validator#readme",
+  "devDependencies": {
+    "@types/jest": "^28.1.6",
+    "@types/node": "^18.6.3",
+    "@types/validator": "^13.7.4",
+    "jest": "^28.1.3",
+    "ts-jest": "^28.0.7",
+    "typescript": "^4.7.4",
+    "validator": "^13.7.0",
+    "vs-logger": "0.0.5"
+  },
+  "keywords": [
+    "schema validators",
+    "schema validation",
+    "schema",
+    "validation",
+    "vs",
+    "vs-schema-validator"
+  ],
+  "peerDependencies": {
+    "vs-logger": "0.0.5"
+  }
+}

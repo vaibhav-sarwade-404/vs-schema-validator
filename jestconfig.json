@@ -1,0 +1,13 @@
+{
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+        "^.+\\.(t|j)s?$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+        "node_modules/(logger/*)"
+    ],
+    "moduleNameMapper":{},
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(ts?)$",
+    "moduleFileExtensions": ["ts","js"]
+}

@@ -1,11 +1,11 @@
-import { Logger } from "vs-logger";
+import { Logger } from "@vs-org/logger";
 
 import {
   GenericObject,
   Properties,
   Schema,
   SchemaError
-} from "./types/SchemaValidator";
+} from "./types/SchemaValidator.types";
 import genericUtils from "./utils/genericUtils";
 import validations, {
   isEmptyObject,
@@ -36,35 +36,27 @@ export class SchemaValidationError {
   }
 }
 
+const logger = Logger.getInstance("info");
+
 export class SchemaValidator {
   private allErrors: boolean;
   private schemas: { [key: string]: Schema };
   private compiledSchemas: { [key: string]: Schema };
   private static instance: SchemaValidator;
-  private constructor({
-    allErrors,
-    debug
-  }: {
-    allErrors: boolean;
-    debug: boolean;
-  }) {
+  private constructor({ allErrors }: { allErrors: boolean }) {
     this.allErrors = allErrors;
     this.schemas = {};
     this.compiledSchemas = {};
-    process.env.DEBUG = String(debug);
   }
 
   public static getInstance({
-    allErrors,
-    debug = false
+    allErrors
   }: {
     allErrors?: boolean;
-    debug?: boolean;
   }): SchemaValidator {
     if (!SchemaValidator.instance) {
       SchemaValidator.instance = new SchemaValidator({
-        allErrors: !!allErrors,
-        debug
+        allErrors: !!allErrors
       });
     }
 
@@ -79,7 +71,7 @@ export class SchemaValidator {
     name: string,
     object: { [key: string]: any }
   ): SchemaValidationError {
-    const log = new Logger(`${SchemaValidator.name}.validate`);
+    const log = logger.getLogger(`${SchemaValidator.name}.validate`);
     log.info(`validating object against schema(${name})`);
     let schemaValidationError = new SchemaValidationError();
 
@@ -131,7 +123,7 @@ export class SchemaValidator {
    * Returns validate function which will take object as parameter to validate
    */
   public compile(name: string, _schema?: Schema): Function {
-    const log = new Logger(`${SchemaValidator.name}.compile`);
+    const log = logger.getLogger(`${SchemaValidator.name}.compile`);
     log.info(`compiling schema validation for schema(${name})`);
     if (
       (this.schemas[name] && !isObject(_schema)) ||
@@ -238,6 +230,7 @@ export class SchemaValidator {
           `Schema has custom validator function, please note custom functions should return true or false as result in any case. True for successful validation, and false for failed validation`
         );
         validators.push(validator);
+        continue;
       }
       schema.properties[property].validator = (value: any): string => {
         log.debug(`Validating for property ${property}`);

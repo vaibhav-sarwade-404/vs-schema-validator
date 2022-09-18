@@ -1,16 +1,18 @@
-import isEmail from "validator/lib/isEmail";
-import { Logger } from "vs-logger";
+import { Logger } from "@vs-org/logger";
 
 import {
   GenericObject,
   Properties,
   PropetyType
-} from "../types/SchemaValidator";
+} from "../types/SchemaValidator.types";
 
+const logger = Logger.getInstance();
 const fileName = "validations";
+const emailRegex =
+  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
 export const isValidEmail = (email: string) => {
-  return isString(email) && isEmail(email);
+  return isString(email) && emailRegex.test(email);
 };
 
 export const isTypeMatches = (
@@ -37,13 +39,13 @@ export const isString = (value: any): boolean =>
 export const isNumber = (value: any): boolean =>
   isTypeMatches(value, { type: "Number" });
 export const isArray = (value: any): boolean =>
-  isTypeMatches(value, { type: "String" });
+  isTypeMatches(value, { type: "Array" });
 export const isUndefined = (value: any): boolean =>
   isTypeMatches(value, { type: "Undefined" });
 export const isNull = (value: any): boolean =>
   isTypeMatches(value, { type: "Null" });
 export const isValidUrl = (url: any): boolean => {
-  const log = new Logger(isValidUrl.name);
+  const log = logger.getLogger(isValidUrl.name);
   try {
     new URL(url);
     return true;
@@ -79,12 +81,14 @@ export const isNullable = (
 
 export const isItemsArray = (
   array: any[],
-  { items = "String" }: Properties
+  { items = ["String"] }: Properties
 ): boolean => {
   if (!isArray(array)) {
     return false;
   }
-  return array.every(arrayEle => isTypeMatches(arrayEle, { type: items }));
+  return array.every(arrayEle =>
+    items.filter(itemType => !isTypeMatches(arrayEle, { type: itemType }))
+  );
 };
 
 export const isArrayWithItemsFrom = (
@@ -120,7 +124,7 @@ export const isPositiveNumber = (value: any) => {
 };
 
 export const isMinLength = (value: any, { minLength = 0 }: Properties) => {
-  const log = new Logger(`${isMinLength.name}`);
+  const log = logger.getLogger(`${isMinLength.name}`);
   if (isArray(value) || isString(value)) {
     return value.length >= minLength;
   }
@@ -134,7 +138,7 @@ export const isMinLength = (value: any, { minLength = 0 }: Properties) => {
 };
 
 export const isMaxLength = (value: any, { maxLength = 0 }: Properties) => {
-  const log = new Logger(`${isMaxLength.name}`);
+  const log = logger.getLogger(`${isMaxLength.name}`);
   if (isArray(value) || isString(value)) {
     return value.length <= maxLength;
   }
@@ -151,7 +155,7 @@ export const isMinLowerCase = (
   value: any,
   { minLowerCase = 0 }: Properties
 ) => {
-  const log = new Logger(`${isMinLowerCase.name}`);
+  const log = logger.getLogger(`${isMinLowerCase.name}`);
   if (isString(value)) {
     return ((value || "").match(/[a-z]/g) || []).length >= minLowerCase;
   }
@@ -165,7 +169,7 @@ export const isMinUpperCase = (
   value: any,
   { minUpperCase = 0 }: Properties
 ) => {
-  const log = new Logger(`${isMinUpperCase.name}`);
+  const log = logger.getLogger(`${isMinUpperCase.name}`);
   if (isString(value)) {
     return ((value || "").match(/[A-Z]/g) || []).length >= minUpperCase;
   }
@@ -176,7 +180,7 @@ export const isMinUpperCase = (
 };
 
 export const isMinNumbers = (value: any, { minNumbers = 0 }: Properties) => {
-  const log = new Logger(`${isMinNumbers.name}`);
+  const log = logger.getLogger(`${isMinNumbers.name}`);
   if (isString(value) || isNumber(value)) {
     return (
       ((value || String(value || "")).match(/\d/g) || []).length >= minNumbers
@@ -189,7 +193,7 @@ export const isMinNumbers = (value: any, { minNumbers = 0 }: Properties) => {
 };
 
 export const isMinSymbols = (value: any, { minSymbols = 0 }: Properties) => {
-  const log = new Logger(`${isMinSymbols.name}`);
+  const log = logger.getLogger(`${isMinSymbols.name}`);
   if (isString(value)) {
     return (value.match(/[^\p{L}\d\s]/u) || []).length >= minSymbols;
   }
@@ -203,7 +207,7 @@ export const isMaxConsecutiveCharsExceed = (
   value: any,
   { maxConsecutiveChars = 0 }: Properties
 ) => {
-  const log = new Logger(`${isMinSymbols.name}`);
+  const log = logger.getLogger(`${isMinSymbols.name}`);
   if (isString(value)) {
     const charCountMap: GenericObject = {};
     const valueArray: string[] = Array.from(value);
@@ -232,7 +236,7 @@ export const validate = (
   validators: Function[],
   validationRule: Properties
 ) => {
-  const log = new Logger(`${fileName}.${validate.name}`);
+  const log = logger.getLogger(`${fileName}.${validate.name}`);
   log.debug(`validating for ${propertyKey} with value as ${value}`);
   let isValid = true;
   for (const validationFunction of validators) {

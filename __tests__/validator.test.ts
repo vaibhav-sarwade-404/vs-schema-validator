@@ -1,4 +1,4 @@
-import { Schema } from "../src/types/SchemaValidator";
+import { Schema } from "../src/types/SchemaValidator.types";
 
 import { SchemaValidationError, SchemaValidator } from "../src/schemaValidator";
 
@@ -7,6 +7,12 @@ describe("Validation", () => {
     allErrors: true
   });
   beforeAll(() => {
+    const isValidEmail = (email: string) => {
+      if (email === "test@test.com") {
+        return "Provided email is invalid";
+      }
+      return "";
+    };
     const validationSchema: Schema = {
       properties: {
         firstName: {
@@ -22,6 +28,10 @@ describe("Validation", () => {
         email: {
           type: "Email",
           required: true
+        },
+        email1: {
+          type: "Email",
+          validator: isValidEmail
         },
         password: {
           type: "String",
@@ -41,7 +51,7 @@ describe("Validation", () => {
     schemaValidator.compile("test");
   });
 
-  test("Validation should fail", () => {
+  test("Failed validation", () => {
     const validationErrors: SchemaValidationError = schemaValidator.validate(
       "test",
       {
@@ -66,6 +76,21 @@ describe("Validation", () => {
     );
     expect(validationErrors && !!validationErrors.getErrors().length).toBe(
       false
+    );
+  });
+
+  test("Failed validation", () => {
+    const validationErrors: SchemaValidationError = schemaValidator.validate(
+      "test",
+      {
+        firstName: "asd",
+        email: "asd@asd.com",
+        email1: "test@test.com",
+        password: "Pass@123"
+      }
+    );
+    expect(validationErrors && !!validationErrors.getErrors().length).toBe(
+      true
     );
   });
 });
